@@ -1,10 +1,16 @@
 package app
 
 import (
+	"fmt"
+
 	"github.com/gnanasuriyan/go-message-server/app/services"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/wire"
 )
+
+type IAppConfig interface {
+	GetPort() uint
+}
 
 type IServer interface {
 	Start()
@@ -12,6 +18,7 @@ type IServer interface {
 
 type Server struct {
 	MessageService services.IMessageService
+	AppConfig      IAppConfig
 }
 
 var NewServer = wire.NewSet(wire.Struct(new(Server), "*"), wire.Bind(new(IServer), new(*Server)))
@@ -23,5 +30,5 @@ func (a *Server) Start() {
 		return c.SendString("Hello, World!")
 	})
 
-	app.Listen(":3000")
+	app.Listen(fmt.Sprintf(":%d", a.AppConfig.GetPort()))
 }
