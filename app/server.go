@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/gnanasuriyan/go-message-server/app/services"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/wire"
 )
@@ -10,6 +11,7 @@ type IServer interface {
 }
 
 type Server struct {
+	MessageService services.IMessageService
 }
 
 var NewServer = wire.NewSet(wire.Struct(new(Server), "*"), wire.Bind(new(IServer), new(*Server)))

@@ -8,11 +8,26 @@ package internal
 
 import (
 	"github.com/gnanasuriyan/go-message-server/app"
+	"github.com/gnanasuriyan/go-message-server/app/repositories"
+	"github.com/gnanasuriyan/go-message-server/app/services"
+	"github.com/google/wire"
 )
 
 // Injectors from wire.go:
 
 func GetServer() app.IServer {
-	server := &app.Server{}
+	userRepository := &repositories.UserRepository{}
+	messageService := &services.MessageService{
+		UserRepository: userRepository,
+	}
+	server := &app.Server{
+		MessageService: messageService,
+	}
 	return server
 }
+
+// wire.go:
+
+var repositorySet = wire.NewSet(repositories.NewUserRepository)
+
+var serviceSet = wire.NewSet(services.NewMessageService, services.NewUserService)
