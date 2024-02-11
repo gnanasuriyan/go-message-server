@@ -1,7 +1,6 @@
 package db
 
 import (
-	"database/sql"
 	"fmt"
 	"sync"
 	"time"
@@ -16,10 +15,12 @@ type IDatabaseConfig interface {
 }
 
 type IAppDB interface {
+	Create(value interface{}) (tx *gorm.DB)
+	Where(query interface{}, args ...interface{}) *gorm.DB
 }
 
 type AppDb struct {
-	*sql.DB
+	*gorm.DB
 }
 
 var once sync.Once
@@ -37,10 +38,10 @@ func InitDatabase() *AppDb {
 		if err != nil {
 			panic(err)
 		}
-		sqlDB.SetMaxIdleConns(10)
-		sqlDB.SetMaxOpenConns(100)
+		sqlDB.SetMaxIdleConns(10)  // TODO: Make this configurable
+		sqlDB.SetMaxOpenConns(100) // TODO: Make this configurable
 		sqlDB.SetConnMaxLifetime(time.Hour)
-		Db = &AppDb{sqlDB}
+		Db = &AppDb{db}
 	})
 	return Db
 }

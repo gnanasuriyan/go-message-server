@@ -20,7 +20,7 @@ import (
 func GetServer() app.IServer {
 	appDb := db.InitDatabase()
 	userRepository := &repositories.UserRepository{
-		AppDB: appDb,
+		Db: appDb,
 	}
 	messageService := &services.MessageService{
 		UserRepository: userRepository,
