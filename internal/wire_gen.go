@@ -35,7 +35,7 @@ func GetServer() app.IServer {
 
 // wire.go:
 
-var repositorySet = wire.NewSet(repositories.NewUserRepository)
+var repositorySet = wire.NewSet(repositories.NewUserRepository, repositories.NewMessageRepository)
 
 var serviceSet = wire.NewSet(services.NewMessageService, services.NewUserService)
 

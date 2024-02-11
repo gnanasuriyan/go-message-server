@@ -14,6 +14,7 @@ import (
 
 var repositorySet = wire.NewSet(
 	repositories.NewUserRepository,
+	repositories.NewMessageRepository,
 )
 
 var serviceSet = wire.NewSet(
