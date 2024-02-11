@@ -11,10 +11,10 @@ CREATE TABLE IF NOT EXISTS `user` (
 
 CREATE TABLE IF NOT EXISTS `message` (
     `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `fk_user_id` int(11) NOT NULL,
+    `fk_user` int(11) NOT NULL,
     `content` text NOT NULL,
     `active` BOOLEAN NOT NULL DEFAULT TRUE,
     `created_at` datetime NOT NULL,
     `updated_at` datetime NOT NULL,
-    FOREIGN KEY (`fk_user_id`) REFERENCES `user`(`id`) ON DELETE NO ACTION
+    FOREIGN KEY (`fk_user`) REFERENCES `user`(`id`) ON DELETE NO ACTION
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
