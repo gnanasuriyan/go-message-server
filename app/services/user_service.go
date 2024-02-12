@@ -51,15 +51,17 @@ func (s *UserService) AuthenticateUser(ctx *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, consts.InvalidRequestBody)
 	}
 	user, err := s.UserRepository.UserByUserName(ctx, loginRequestDto.Username)
-	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, consts.SomethingWentWrong)
-	}
-	if user == nil {
+	if err != nil && err.Error() == consts.RecordNotFound {
 		return fiber.NewError(fiber.StatusUnauthorized, consts.InvalidUsernameOrPassword)
+	} else if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, consts.SomethingWentWrong)
 	}
 	if user.Password != loginRequestDto.Password {
 		return fiber.NewError(fiber.StatusUnauthorized, consts.InvalidUsernameOrPassword)
 	}
 	// TODO: return JWT token
-	return ctx.JSON(user)
+	return ctx.JSON(models.LoginUserDto{
+		Username: user.Username,
+		ID:       user.ID,
+	})
 }

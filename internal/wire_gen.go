@@ -31,6 +31,7 @@ func GetServer() app.IServer {
 	}
 	messageService := &services.MessageService{
 		MessageRepository: messageRepository,
+		UserRepository:    userRepository,
 	}
 	server := &app.Server{
 		AppConfig:      configConfig,

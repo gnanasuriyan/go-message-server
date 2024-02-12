@@ -23,7 +23,7 @@ var NewMessageRepository = wire.NewSet(wire.Struct(new(MessageRepository), "*"),
 
 func (r *MessageRepository) FindAll(ctx *fiber.Ctx, pagination models.PaginationDto) ([]models.Message, error) {
 	var messages []models.Message
-	tx := r.Db.Where("`active` = ?", 1).Limit(pagination.Limit).Offset(pagination.Limit * (pagination.Page - 1)).Find(&messages)
+	tx := r.Db.Where("`active` = ?", 1).Order("`created_at`").Limit(pagination.Limit).Offset(pagination.Limit * (pagination.Page - 1)).Find(&messages)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}

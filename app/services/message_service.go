@@ -18,6 +18,7 @@ type IMessageService interface {
 
 type MessageService struct {
 	MessageRepository repositories.IMessageRepository
+	UserRepository    repositories.IUserRepository
 }
 
 var NewMessageService = wire.NewSet(wire.Struct(new(MessageService), "*"), wire.Bind(new(IMessageService), new(*MessageService)))
@@ -47,7 +48,7 @@ func (s *MessageService) ListMessages(ctx *fiber.Ctx) error {
 	if userIdStr == nil || len(userIdStr) == 0 {
 		return fiber.NewError(fiber.StatusUnauthorized, consts.Unauthorized)
 	}
-	_, err := strconv.Atoi(userIdStr[0])
+	currentUserId, err := strconv.Atoi(userIdStr[0])
 	if err != nil {
 		return fiber.NewError(fiber.StatusUnauthorized, consts.Unauthorized)
 	}
@@ -59,5 +60,20 @@ func (s *MessageService) ListMessages(ctx *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, consts.SomethingWentWrong)
 	}
-	return ctx.JSON(messages)
+	var messageResponse []models.MessageResponseDto
+	// TODO: this can be optimized by using a join query or cache the user details
+	for _, message := range messages {
+		user, err := s.UserRepository.UserById(ctx, int(message.FkUser))
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, consts.SomethingWentWrong)
+		}
+		messageResponse = append(messageResponse, models.MessageResponseDto{
+			ID:                    message.ID,
+			Content:               message.Content,
+			CreatedAt:             message.CreatedAt,
+			PostedBy:              user.Username,
+			IsPostedByCurrentUser: currentUserId == int(message.FkUser),
+		})
+	}
+	return ctx.JSON(messageResponse)
 }

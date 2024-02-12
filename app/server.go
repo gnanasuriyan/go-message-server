@@ -6,8 +6,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 
-	"github.com/gofiber/fiber/v2/middleware/csrf"
-
 	"github.com/gofiber/fiber/v2/middleware/cors"
 
 	"github.com/gnanasuriyan/go-message-server/app/services"
@@ -34,7 +32,6 @@ var NewServer = wire.NewSet(wire.Struct(new(Server), "*"), wire.Bind(new(IServer
 func (a *Server) Start() {
 	app := fiber.New()
 	app.Use(cors.New())
-	app.Use(csrf.New())
 	app.Use(requestid.New())
 	app.Use(logger.New())
 
@@ -51,6 +48,7 @@ func (a *Server) Start() {
 	// protected routes
 	// TODO: finish with jwt middleware
 	api.Post("/message", a.MessageService.PostMessage)
+	api.Get("/messages", a.MessageService.ListMessages)
 
 	if err := app.Listen(fmt.Sprintf(":%d", a.AppConfig.GetPort())); err != nil {
 		panic(err)

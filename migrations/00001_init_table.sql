@@ -18,5 +18,5 @@ CREATE TABLE IF NOT EXISTS `messages` (
     `active` BOOLEAN NOT NULL DEFAULT TRUE,
     `created_at` datetime NOT NULL,
     `updated_at` datetime NOT NULL,
-    FOREIGN KEY (`fk_user`) REFERENCES `user`(`id`) ON DELETE NO ACTION
+    FOREIGN KEY (`fk_user`) REFERENCES `users`(`id`) ON DELETE NO ACTION
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

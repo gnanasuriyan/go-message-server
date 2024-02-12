@@ -33,7 +33,7 @@ func TestMessageRepository_FindAll(t *testing.T) {
 
 	messageRepository := repositories.MessageRepository{Db: dbMock.DB}
 	mock := dbMock.Sqlmock
-	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `messages` WHERE `active` = ? LIMIT ?")).WillReturnRows(rows)
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `messages` WHERE `active` = ? ORDER BY `created_at` LIMIT ?")).WillReturnRows(rows)
 
 	app := fiber.New()
 	ctx := app.AcquireCtx(&fasthttp.RequestCtx{})

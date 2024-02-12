@@ -14,3 +14,11 @@ type Message struct {
 type MessageCreateDto struct {
 	Content string `json:"content"`
 }
+
+type MessageResponseDto struct {
+	ID                    uint      `json:"id"`
+	Content               string    `json:"content"`
+	PostedBy              string    `json:"posted_by"`
+	CreatedAt             time.Time `json:"created_at"`
+	IsPostedByCurrentUser bool      `json:"is_posted_by_current_user"`
+}

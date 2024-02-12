@@ -7,4 +7,5 @@ const (
 	InvalidUsernameOrPassword = "Invalid username or password"
 	SomethingWentWrong        = "Something went wrong"
 	InvalidQueryParameters    = "Invalid query parameters"
+	RecordNotFound            = "record not found"
 )

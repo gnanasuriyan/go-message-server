@@ -84,9 +84,14 @@ func TestMessageService_PostMessage_ListMessages(t *testing.T) {
 		AddRow(10, 1, "Sample message 10", true, time.Now(), time.Now())
 
 	messageRepository := repositories.MessageRepository{Db: dbMock.DB}
-	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `messages` WHERE `active` = ? LIMIT ?")).WillReturnRows(rows)
+	userRepository := repositories.UserRepository{Db: dbMock.DB}
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `messages` WHERE `active` = ? ORDER BY `created_at` LIMIT ?")).WillReturnRows(rows)
+
+	userRows := sqlmock.NewRows([]string{"id", "username", "password", "active", "shadow_active", "created_at", "updated_at"}).AddRow(1, "test_user_1", "123", true, true, time.Now(), time.Now())
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `id` = 1 AND `active` = 1 ORDER BY `users`.`id` LIMIT 1")).WillReturnRows(userRows)
+
 	app := fiber.New()
-	messageService := services.MessageService{MessageRepository: &messageRepository}
+	messageService := services.MessageService{MessageRepository: &messageRepository, UserRepository: &userRepository}
 	app.Get("/", messageService.ListMessages)
 	req := httptest.NewRequest("GET", fmt.Sprintf("/?page=%d&limit=%d", 1, 10), nil)
 	req.Header.Set("Content-Type", "application/json")
