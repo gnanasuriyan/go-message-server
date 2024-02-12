@@ -33,6 +33,8 @@ var databaseSet = wire.NewSet(
 	wire.Bind(new(db.IAppDB), new(*db.AppDb)),
 )
 
+//var middleWareSet = wire.NewSet(middlewares.NewAuthMiddleWare)
+
 func GetServer() app.IServer {
 	wire.Build(
 		configSet,

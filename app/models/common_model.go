@@ -1,8 +1,8 @@
 package models
 
 type PaginationDto struct {
-	Page  int `json:"page"`
-	Limit int `json:"limit"`
+	Page  int `json:"page" query:"page"`
+	Limit int `json:"limit" query:"limit"`
 }
 
 type LoginRequestDto struct {

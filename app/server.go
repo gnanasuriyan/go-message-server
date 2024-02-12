@@ -38,13 +38,18 @@ func (a *Server) Start() {
 	app.Use(requestid.New())
 	app.Use(logger.New())
 
-	app.Post("/api/v1/login", a.UserService.AuthenticateUser)
-	app.Post("/api/v1/signup", a.UserService.Signup)
-	app.Post("/api/v1/message", a.MessageService.PostMessage)
-
 	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
+		return c.SendString("Pong!")
 	})
+
+	api := app.Group("/api/v1", func(c *fiber.Ctx) error {
+		return c.Next()
+	})
+	api.Post("/login", a.UserService.AuthenticateUser)
+	api.Post("/signup", a.UserService.Signup)
+
+	// protected routes
+	api.Post("/message", a.MessageService.PostMessage)
 
 	if err := app.Listen(fmt.Sprintf(":%d", a.AppConfig.GetPort())); err != nil {
 		panic(err)

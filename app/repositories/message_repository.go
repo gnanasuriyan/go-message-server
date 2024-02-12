@@ -11,7 +11,7 @@ import (
 )
 
 type IMessageRepository interface {
-	Insert(ctx *fiber.Ctx, dto models.MessageCreateDto) (*models.Message, error)
+	Insert(ctx *fiber.Ctx, userId uint, dto models.MessageCreateDto) (*models.Message, error)
 	FindAll(ctx *fiber.Ctx, pagination models.PaginationDto) ([]models.Message, error)
 }
 
@@ -30,9 +30,9 @@ func (r *MessageRepository) FindAll(ctx *fiber.Ctx, pagination models.Pagination
 	return messages, nil
 }
 
-func (r *MessageRepository) Insert(ctx *fiber.Ctx, dto models.MessageCreateDto) (*models.Message, error) {
+func (r *MessageRepository) Insert(ctx *fiber.Ctx, userId uint, dto models.MessageCreateDto) (*models.Message, error) {
 	message := models.Message{
-		FkUser:  dto.FkUser,
+		FkUser:  userId,
 		Content: dto.Content,
 		Active:  true,
 	}

@@ -12,6 +12,5 @@ type Message struct {
 }
 
 type MessageCreateDto struct {
-	FkUser  uint   `json:"fk_user"`
 	Content string `json:"content"`
 }

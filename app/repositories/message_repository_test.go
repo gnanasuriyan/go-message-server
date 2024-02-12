@@ -57,8 +57,7 @@ func TestMessageRepository_Insert_No_Error(t *testing.T) {
 
 	app := fiber.New()
 	ctx := app.AcquireCtx(&fasthttp.RequestCtx{})
-	user, err := messageRepository.Insert(ctx, models.MessageCreateDto{
-		FkUser:  1,
+	user, err := messageRepository.Insert(ctx, uint(1), models.MessageCreateDto{
 		Content: "Some dummy message",
 	})
 	a := assert.New(t)
@@ -76,8 +75,7 @@ func TestMessageRepository_Insert_Return_Error(t *testing.T) {
 
 	app := fiber.New()
 	ctx := app.AcquireCtx(&fasthttp.RequestCtx{})
-	user, err := messageRepository.Insert(ctx, models.MessageCreateDto{
-		FkUser:  1,
+	user, err := messageRepository.Insert(ctx, uint(1), models.MessageCreateDto{
 		Content: "Some dummy message",
 	})
 	a := assert.New(t)

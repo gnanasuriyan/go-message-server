@@ -18,17 +18,24 @@ import (
 // Injectors from wire.go:
 
 func GetServer() app.IServer {
+	configConfig := config.GetConfig()
 	appDb := db.InitDatabase()
 	userRepository := &repositories.UserRepository{
 		Db: appDb,
 	}
-	messageService := &services.MessageService{
+	userService := &services.UserService{
 		UserRepository: userRepository,
 	}
-	configConfig := config.GetConfig()
+	messageRepository := &repositories.MessageRepository{
+		Db: appDb,
+	}
+	messageService := &services.MessageService{
+		MessageRepository: messageRepository,
+	}
 	server := &app.Server{
-		MessageService: messageService,
 		AppConfig:      configConfig,
+		UserService:    userService,
+		MessageService: messageService,
 	}
 	return server
 }
