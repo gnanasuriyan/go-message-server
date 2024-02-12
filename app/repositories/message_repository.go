@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"context"
+	"github.com/gofiber/fiber/v2"
 
 	"github.com/google/wire"
 
@@ -11,8 +11,8 @@ import (
 )
 
 type IMessageRepository interface {
-	Insert(ctx context.Context, dto models.MessageCreate) (*models.Message, error)
-	FindAll(ctx context.Context, pagination models.Pagination) ([]models.Message, error)
+	Insert(ctx *fiber.Ctx, dto models.MessageCreateDto) (*models.Message, error)
+	FindAll(ctx *fiber.Ctx, pagination models.PaginationDto) ([]models.Message, error)
 }
 
 type MessageRepository struct {
@@ -21,7 +21,7 @@ type MessageRepository struct {
 
 var NewMessageRepository = wire.NewSet(wire.Struct(new(MessageRepository), "*"), wire.Bind(new(IMessageRepository), new(*MessageRepository)))
 
-func (r *MessageRepository) FindAll(ctx context.Context, pagination models.Pagination) ([]models.Message, error) {
+func (r *MessageRepository) FindAll(ctx *fiber.Ctx, pagination models.PaginationDto) ([]models.Message, error) {
 	var messages []models.Message
 	tx := r.Db.Where("`active` = ?", 1).Limit(pagination.Limit).Offset(pagination.Limit * (pagination.Page - 1)).Find(&messages)
 	if tx.Error != nil {
@@ -30,7 +30,7 @@ func (r *MessageRepository) FindAll(ctx context.Context, pagination models.Pagin
 	return messages, nil
 }
 
-func (r *MessageRepository) Insert(ctx context.Context, dto models.MessageCreate) (*models.Message, error) {
+func (r *MessageRepository) Insert(ctx *fiber.Ctx, dto models.MessageCreateDto) (*models.Message, error) {
 	message := models.Message{
 		FkUser:  dto.FkUser,
 		Content: dto.Content,

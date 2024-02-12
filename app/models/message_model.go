@@ -11,7 +11,7 @@ type Message struct {
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
 
-type MessageCreate struct {
+type MessageCreateDto struct {
 	FkUser  uint   `json:"fk_user"`
 	Content string `json:"content"`
 }

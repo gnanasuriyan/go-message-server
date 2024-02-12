@@ -12,8 +12,13 @@ type User struct {
 	UpdatedAt    time.Time `json:"updated_at" db:"updated_at"`
 }
 
-type UserCreate struct {
-	Username        string `json:"username"`
-	Password        string `json:"password"`
-	ConfirmPassword string `json:"confirm_password"`
+type UserCreateDto struct {
+	Username        string `json:"username" form:"username"`
+	Password        string `json:"password" form:"password"`
+	ConfirmPassword string `json:"confirm_password" form:"confirm_password"`
+}
+
+type AuthenticateUserDto struct {
+	Username string `json:"username" form:"username"`
+	Password string `json:"password" form:"password"`
 }

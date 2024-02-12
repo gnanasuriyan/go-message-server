@@ -1,11 +1,13 @@
 package repositories_test
 
 import (
-	"context"
 	"errors"
 	"regexp"
 	"testing"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/valyala/fasthttp"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gnanasuriyan/go-message-server/app/models"
@@ -15,7 +17,7 @@ import (
 )
 
 func TestMessageRepository_FindAll(t *testing.T) {
-	ctx := context.Background()
+
 	dbMock := test.NewMockDB()
 	rows := sqlmock.NewRows([]string{"id", "fk_user", "content", "active", "created_at", "updated_at"}).
 		AddRow(1, 1, "Sample message 1", true, time.Now(), time.Now()).
@@ -32,47 +34,55 @@ func TestMessageRepository_FindAll(t *testing.T) {
 	messageRepository := repositories.MessageRepository{Db: dbMock.DB}
 	mock := dbMock.Sqlmock
 	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `messages` WHERE `active` = ? LIMIT ?")).WillReturnRows(rows)
-	messages, err := messageRepository.FindAll(ctx, models.Pagination{
+
+	app := fiber.New()
+	ctx := app.AcquireCtx(&fasthttp.RequestCtx{})
+	messages, err := messageRepository.FindAll(ctx, models.PaginationDto{
 		Page:  1,
 		Limit: 10,
 	})
-	assert := assert.New(t)
-	assert.NoError(err)
-	assert.NotNil(messages)
+	a := assert.New(t)
+	a.NoError(err)
+	a.NotNil(messages)
+	a.Equal(10, len(messages))
 }
 
 func TestMessageRepository_Insert_No_Error(t *testing.T) {
-	ctx := context.Background()
 	dbMock := test.NewMockDB()
 	messageRepository := repositories.MessageRepository{Db: dbMock.DB}
 	mock := dbMock.Sqlmock
 	mock.ExpectBegin()
 	mock.ExpectExec("^INSERT INTO `messages` (.+)$").WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
-	user, err := messageRepository.Insert(ctx, models.MessageCreate{
+
+	app := fiber.New()
+	ctx := app.AcquireCtx(&fasthttp.RequestCtx{})
+	user, err := messageRepository.Insert(ctx, models.MessageCreateDto{
 		FkUser:  1,
 		Content: "Some dummy message",
 	})
-	assert := assert.New(t)
-	assert.NoError(err)
-	assert.NotNil(user)
+	a := assert.New(t)
+	a.NoError(err)
+	a.NotNil(user)
 }
 
 func TestMessageRepository_Insert_Return_Error(t *testing.T) {
-	ctx := context.Background()
 	dbMock := test.NewMockDB()
 	messageRepository := repositories.MessageRepository{Db: dbMock.DB}
 	mock := dbMock.Sqlmock
 	mock.ExpectBegin()
 	mock.ExpectExec("^INSERT INTO `messages` (.+)$").WillReturnError(errors.New("error"))
 	mock.ExpectRollback()
-	user, err := messageRepository.Insert(ctx, models.MessageCreate{
+
+	app := fiber.New()
+	ctx := app.AcquireCtx(&fasthttp.RequestCtx{})
+	user, err := messageRepository.Insert(ctx, models.MessageCreateDto{
 		FkUser:  1,
 		Content: "Some dummy message",
 	})
-	assert := assert.New(t)
-	assert.Error(err)
-	assert.Nil(user)
+	a := assert.New(t)
+	a.Error(err)
+	a.Nil(user)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}

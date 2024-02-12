@@ -3,6 +3,13 @@ package app
 import (
 	"fmt"
 
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
+
+	"github.com/gofiber/fiber/v2/middleware/csrf"
+
+	"github.com/gofiber/fiber/v2/middleware/cors"
+
 	"github.com/gnanasuriyan/go-message-server/app/services"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/wire"
@@ -17,18 +24,29 @@ type IServer interface {
 }
 
 type Server struct {
-	MessageService services.IMessageService
 	AppConfig      IAppConfig
+	UserService    services.IUserService
+	MessageService services.IMessageService
 }
 
 var NewServer = wire.NewSet(wire.Struct(new(Server), "*"), wire.Bind(new(IServer), new(*Server)))
 
 func (a *Server) Start() {
 	app := fiber.New()
+	app.Use(cors.New())
+	app.Use(csrf.New())
+	app.Use(requestid.New())
+	app.Use(logger.New())
+
+	app.Post("/api/v1/login", a.UserService.AuthenticateUser)
+	app.Post("/api/v1/signup", a.UserService.Signup)
+	app.Post("/api/v1/message", a.MessageService.PostMessage)
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
 
-	app.Listen(fmt.Sprintf(":%d", a.AppConfig.GetPort()))
+	if err := app.Listen(fmt.Sprintf(":%d", a.AppConfig.GetPort())); err != nil {
+		panic(err)
+	}
 }
