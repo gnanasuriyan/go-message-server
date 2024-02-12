@@ -16,4 +16,6 @@ if [ "$1" == "wire" ]; then
     wire
 elif [ "$1" == "init-db" ]; then
   initDatabase
+elif [ "$1" == "run-test" ]; then
+    go test --cover ./...
 fi
