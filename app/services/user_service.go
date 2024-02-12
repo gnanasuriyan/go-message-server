@@ -28,7 +28,7 @@ func (s *UserService) Signup(ctx *fiber.Ctx) error {
 	if strings.Trim(userCreateDto.Password, " ") != strings.Trim(userCreateDto.ConfirmPassword, " ") {
 		return fiber.NewError(fiber.StatusBadRequest, "Password and Confirm Password are not same")
 	}
-	//TODO: password hash instead of raw password
+	//TODO: save password hash instead of raw password
 	_, err := s.UserRepository.Insert(ctx, models.User{
 		Username: userCreateDto.Username,
 		Password: userCreateDto.Password,
@@ -44,18 +44,18 @@ func (s *UserService) Signup(ctx *fiber.Ctx) error {
 }
 
 func (s *UserService) AuthenticateUser(ctx *fiber.Ctx) error {
-	authenticateUserDto := new(models.AuthenticateUserDto)
-	if err := ctx.BodyParser(authenticateUserDto); err != nil {
+	loginRequestDto := new(models.LoginRequestDto)
+	if err := ctx.BodyParser(loginRequestDto); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "Invalid request body")
 	}
-	user, err := s.UserRepository.UserByUserName(ctx, authenticateUserDto.Username)
+	user, err := s.UserRepository.UserByUserName(ctx, loginRequestDto.Username)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Something went wrong while authenticating user")
 	}
 	if user == nil {
 		return fiber.NewError(fiber.StatusUnauthorized, "Invalid username or password")
 	}
-	if user.Password != authenticateUserDto.Password {
+	if user.Password != loginRequestDto.Password {
 		return fiber.NewError(fiber.StatusUnauthorized, "Invalid username or password")
 	}
 	// TODO: return JWT token

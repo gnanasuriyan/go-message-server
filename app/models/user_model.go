@@ -17,8 +17,3 @@ type UserCreateDto struct {
 	Password        string `json:"password" form:"password"`
 	ConfirmPassword string `json:"confirm_password" form:"confirm_password"`
 }
-
-type AuthenticateUserDto struct {
-	Username string `json:"username" form:"username"`
-	Password string `json:"password" form:"password"`
-}

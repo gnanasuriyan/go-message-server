@@ -11,7 +11,7 @@ type IMessageService interface {
 }
 
 type MessageService struct {
-	UserRepository repositories.IUserRepository
+	MessageRepository repositories.IMessageRepository
 }
 
 var NewMessageService = wire.NewSet(wire.Struct(new(MessageService), "*"), wire.Bind(new(IMessageService), new(*MessageService)))
