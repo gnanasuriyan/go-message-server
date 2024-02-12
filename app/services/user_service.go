@@ -3,6 +3,8 @@ package services
 import (
 	"strings"
 
+	"github.com/gnanasuriyan/go-message-server/app/consts"
+
 	"github.com/gnanasuriyan/go-message-server/app/models"
 	"github.com/gnanasuriyan/go-message-server/app/repositories"
 	"github.com/gofiber/fiber/v2"
@@ -23,10 +25,10 @@ var NewUserService = wire.NewSet(wire.Struct(new(UserService), "*"), wire.Bind(n
 func (s *UserService) Signup(ctx *fiber.Ctx) error {
 	userCreateDto := new(models.UserCreateDto)
 	if err := ctx.BodyParser(userCreateDto); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "Invalid request body")
+		return fiber.NewError(fiber.StatusBadRequest, consts.InvalidRequestBody)
 	}
 	if strings.Trim(userCreateDto.Password, " ") != strings.Trim(userCreateDto.ConfirmPassword, " ") {
-		return fiber.NewError(fiber.StatusBadRequest, "Password and Confirm Password are not same")
+		return fiber.NewError(fiber.StatusBadRequest, consts.PasswordMismatch)
 	}
 	//TODO: save password hash instead of raw password
 	_, err := s.UserRepository.Insert(ctx, models.User{
@@ -35,7 +37,7 @@ func (s *UserService) Signup(ctx *fiber.Ctx) error {
 		Active:   true,
 	})
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Something went wrong while creating user")
+		return fiber.NewError(fiber.StatusInternalServerError, consts.SomethingWentWrong)
 	}
 	return ctx.JSON(models.SuccessResponseDto{
 		Success: true,
@@ -46,17 +48,17 @@ func (s *UserService) Signup(ctx *fiber.Ctx) error {
 func (s *UserService) AuthenticateUser(ctx *fiber.Ctx) error {
 	loginRequestDto := new(models.LoginRequestDto)
 	if err := ctx.BodyParser(loginRequestDto); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "Invalid request body")
+		return fiber.NewError(fiber.StatusBadRequest, consts.InvalidRequestBody)
 	}
 	user, err := s.UserRepository.UserByUserName(ctx, loginRequestDto.Username)
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Something went wrong while authenticating user")
+		return fiber.NewError(fiber.StatusInternalServerError, consts.SomethingWentWrong)
 	}
 	if user == nil {
-		return fiber.NewError(fiber.StatusUnauthorized, "Invalid username or password")
+		return fiber.NewError(fiber.StatusUnauthorized, consts.InvalidUsernameOrPassword)
 	}
 	if user.Password != loginRequestDto.Password {
-		return fiber.NewError(fiber.StatusUnauthorized, "Invalid username or password")
+		return fiber.NewError(fiber.StatusUnauthorized, consts.InvalidUsernameOrPassword)
 	}
 	// TODO: return JWT token
 	return ctx.JSON(user)

@@ -49,6 +49,7 @@ func (a *Server) Start() {
 	api.Post("/signup", a.UserService.Signup)
 
 	// protected routes
+	// TODO: finish with jwt middleware
 	api.Post("/message", a.MessageService.PostMessage)
 
 	if err := app.Listen(fmt.Sprintf(":%d", a.AppConfig.GetPort())); err != nil {
